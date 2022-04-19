@@ -5,7 +5,9 @@ import random
 import warnings
 
 import numpy as np
+# import torch
 import torch
+print(torch.__version__)
 import torch.nn as nn
 import torch.nn.parallel
 import torch.backends.cudnn as cudnn
@@ -24,7 +26,7 @@ def main(args):
     For (Distributed)DataParallelism,
     main(args) spawn each process (main_worker) to each GPU.
     '''
-
+    print(args)
     save_path = os.path.join(args.save_dir, args.save_name)
     if os.path.exists(save_path) and args.overwrite and  args.resume == False:
         import shutil
@@ -54,15 +56,19 @@ def main(args):
 
     # distributed: true if manually selected or if world_size > 1
     args.distributed = args.world_size > 1 or args.multiprocessing_distributed
-    ngpus_per_node = torch.cuda.device_count()  # number of gpus of each node
+    ngpus_per_node = torch.cuda.device_count() # number of gpus of each node
+    ngpus_per_node = 1 # this is me
+    print("ngpus_per_node = " + str(ngpus_per_node))
 
     if args.multiprocessing_distributed:
+        print(True)
         # now, args.world_size means num of total processes in all nodes
         args.world_size = ngpus_per_node * args.world_size
 
         # args=(,) means the arguments of main_worker
         mp.spawn(main_worker, nprocs=ngpus_per_node, args=(ngpus_per_node, args))
     else:
+        print(False)
         main_worker(args.gpu, ngpus_per_node, args)
 
 
